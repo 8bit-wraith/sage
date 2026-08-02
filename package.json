@@ -20,7 +20,7 @@
 		"@ai-sdk/deepseek": "^0.1.8",
 		"@ai-sdk/openai": "^1.1.9",
 		"@ai-sdk/togetherai": "^0.1.8",
-		"ai": "^4.1.9",
+		"ai": "^7.0.48",
 		"elysia": "^1.2.10",
 		"ollama-ai-provider": "^1.2.0",
 		"open": "^10.1.0"
