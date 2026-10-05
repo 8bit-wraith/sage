@@ -73,7 +73,20 @@ function getLLMProvider() {
 function transcribe(id: string): Promise<string> {
 	return new Promise((resolve, reject) => {
 		const whisperProcess = spawn(CONFIG.WHISPER, [CONFIG.WHISPER_MODEL, id]);
-		whisperProcess.stdout.on('end', () => {
+		let failed = false;
+		whisperProcess.once('error', (error) => {
+			failed = true;
+			reject(error);
+		});
+		// Drain unused output so a full pipe cannot stall the subprocess.
+		whisperProcess.stdout.resume();
+		whisperProcess.stderr.resume();
+		whisperProcess.once('close', (code, signal) => {
+			if (failed) return;
+			if (code !== 0 || signal) {
+				reject(new Error(`Whisper failed (${signal || code})`));
+				return;
+			}
 			fs.readFile(`${CONFIG.TMP}/transcripts/${id}.txt`, 'utf-8')
 				.then((tsc) => resolve(cleanTranscript(tsc)))
 				.catch(reject);
