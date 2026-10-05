@@ -4,7 +4,10 @@ const fs = require('node:fs');
 const path = require('node:path');
 const vm = require('node:vm');
 const {EventEmitter} = require('node:events');
-const {stripTypeScriptTypes} = require('node:module');
+// Use the active runtime's compiler while testing the same source function.
+const stripTypeScriptTypes = typeof Bun !== 'undefined'
+ ? source => new Bun.Transpiler({loader: 'ts'}).transformSync(source)
+ : require('node:module').stripTypeScriptTypes;
 function fixture() {
  const source=fs.readFileSync(path.join(__dirname,'../index.ts'),'utf8');
  const body=source.slice(source.indexOf('function transcribe('),source.indexOf('\nclass TTSStream'));
